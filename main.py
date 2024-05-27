@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from kafka import KafkaConsumer, KafkaProducer, TopicPartition
 from dotenv import load_dotenv
 
-TOPIC_PREFIX = 'i483-sensors-2410064'
+TOPIC_PREFIX = 'i483-sensors-s2410064'
 load_dotenv()
 
 consumer = KafkaConsumer(bootstrap_servers=[os.getenv('BOOTSTRAP_SERVER')], group_id='bmp180_scd41')
@@ -42,7 +42,7 @@ while True:
                     temperatures_last_five_minutes.append(temperature)
 
                 average_temperature_last_five_minutes = round(sum(temperatures_last_five_minutes) / len(temperatures_last_five_minutes), 1)
-                producer.send('i483-2410064-BMP180_avg-temperature', str(average_temperature_last_five_minutes).encode())
+                producer.send('i483-s2410064-BMP180_avg-temperature', str(average_temperature_last_five_minutes).encode())
                 print(f'Temperatures in last five minutes: {temperatures_last_five_minutes}')
                 print(f'Average temperature: {average_temperature_last_five_minutes} °C')
 
@@ -52,9 +52,9 @@ while True:
                 co2 = int(record.value.decode())
                 print(f'CO2: {co2} ppm')
                 if co2 > 700:
-                    producer.send('i483-2410064-co2_threshold-crossed', 'yes'.encode())
+                    producer.send('i483-s2410064-co2_threshold-crossed', 'yes'.encode())
                 else:
-                    producer.send('i483-2410064-co2_threshold-crossed', 'no'.encode())
+                    producer.send('i483-s2410064-co2_threshold-crossed', 'no'.encode())
 
     consumer.commit()
 
