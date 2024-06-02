@@ -42,7 +42,7 @@ while True:
                     temperatures_last_five_minutes.append(temperature)
 
                 average_temperature_last_five_minutes = round(sum(temperatures_last_five_minutes) / len(temperatures_last_five_minutes), 1)
-                producer.send('i483-s2410064-BMP180_avg-temperature', str(average_temperature_last_five_minutes).encode())
+                producer.send(f'{TOPIC_PREFIX}-BMP180_avg-temperature', str(average_temperature_last_five_minutes).encode())
                 print(f'Temperatures in last five minutes: {temperatures_last_five_minutes}')
                 print(f'Average temperature: {average_temperature_last_five_minutes} °C')
 
@@ -52,9 +52,9 @@ while True:
                 co2 = int(record.value.decode())
                 print(f'CO2: {co2} ppm')
                 if co2 > 700:
-                    producer.send('i483-s2410064-co2_threshold-crossed', 'yes'.encode())
+                    producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'yes'.encode())
                 else:
-                    producer.send('i483-s2410064-co2_threshold-crossed', 'no'.encode())
+                    producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'no'.encode())
 
     consumer.commit()
 
