@@ -20,6 +20,7 @@ consumer.assign(topic_partitions)
 consumer.seek_to_end(topic_partitions[1])
 
 count = 0
+prev_co2 = None
 
 while True:
     unix_timestamp_five_minutes_ago_s = datetime.timestamp(datetime.now() - timedelta(minutes=5))
@@ -49,12 +50,14 @@ while True:
                 count = 0
         elif topic_partition.topic == f'{TOPIC_PREFIX}-SCD41-co2':
             for record in messages[topic_partition]:
-                co2 = int(record.value.decode())
-                print(f'CO2: {co2} ppm')
-                if co2 > 700:
-                    producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'yes'.encode())
-                else:
-                    producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'no'.encode())
+                current_co2 = int(record.value.decode())
+                print(f'CO2: {current_co2} ppm')
+                if (prev_co2 is not None) and (prev_co2 < 700 < current_co2 or current_co2 < 700 < prev_co2):
+                    if current_co2 > 700:
+                        producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'yes'.encode())
+                    else:
+                        producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'no'.encode())
+                prev_co2 = current_co2
 
     consumer.commit()
 

@@ -1,4 +1,4 @@
-# kafka-subscriber-publisher
+# kafka-consumer-producer
 The programs of 1c of assignment 2.
 ## Usage
 Run the following command to install `python-dotenv` and `kafka-python`.
