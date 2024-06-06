@@ -44,14 +44,11 @@ while True:
 
                 average_temperature_last_five_minutes = round(sum(temperatures_last_five_minutes) / len(temperatures_last_five_minutes), 1)
                 producer.send(f'{TOPIC_PREFIX}-BMP180_avg-temperature', str(average_temperature_last_five_minutes).encode())
-                print(f'Temperatures in last five minutes: {temperatures_last_five_minutes}')
-                print(f'Average temperature: {average_temperature_last_five_minutes} °C')
 
                 count = 0
         elif topic_partition.topic == f'{TOPIC_PREFIX}-SCD41-co2':
             for record in messages[topic_partition]:
                 current_co2 = int(record.value.decode())
-                print(f'CO2: {current_co2} ppm')
                 if (prev_co2 is not None) and (prev_co2 < 700 < current_co2 or current_co2 < 700 < prev_co2):
                     if current_co2 > 700:
                         producer.send(f'{TOPIC_PREFIX}-co2_threshold-crossed', 'yes'.encode())
@@ -63,6 +60,5 @@ while True:
 
     time.sleep(1)
     count += 1
-    print(count)
 
 
